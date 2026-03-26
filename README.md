@@ -1,10 +1,10 @@
 # Unity ARPG Combat Demo
 
-## 📌 Project Overview
+##  Project Overview
 A third-person ARPG combat demo developed independently using Unity and C#.  
 The project focuses on a Root Motion-driven combat system and an event-driven architecture, including character combat, camera control, and basic client-side framework design.
 
-## 🎮 Features
+##  Features
 - Root Motion-based character movement and combat system  
 - Attack, hit reaction, and combo logic implementation  
 - Cinemachine-based camera system (state switching, screen shake, FOV change)  
@@ -12,13 +12,13 @@ The project focuses on a Root Motion-driven combat system and an event-driven ar
 - UI system based on finite state machine  
 - Generic object pool for performance optimization  
 
-## 🛠 Tech Stack
+##  Tech Stack
 - Unity (C#)  
 - Animator (Root Motion)  
 - Cinemachine  
 - ScriptableObject (Event System)  
 
-## 🚀 Highlights
+##  Highlights
 - Implemented a Root Motion-driven combat system to ensure animation-motion consistency  
 - Designed a modular client architecture with event-driven communication  
 - Applied object pooling to reduce GC allocation and improve runtime performance  
