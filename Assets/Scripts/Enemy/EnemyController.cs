@@ -7,7 +7,6 @@ public class EnemyController : MonoBehaviour
 {
     [Header("组件")]
     private EnemysStateManager enemysStateManager;
-    //private Rigidbody rb;
     private CharacterController cc;
     private DistanceDetection disDetection;
     public Image bloodImage;
@@ -44,7 +43,6 @@ public class EnemyController : MonoBehaviour
     {
         enemysStateManager = GetComponent<EnemysStateManager>();
         cc = GetComponent<CharacterController>();
-        //rb = GetComponent<Rigidbody>();
         disDetection = GetComponentInChildren<DistanceDetection>();
         currentBlood = blood;
         attackDetection.SetActive(false);
@@ -96,7 +94,10 @@ public class EnemyController : MonoBehaviour
         {
             bloodImage.fillAmount = Mathf.Clamp(currentBlood / blood, 0, 1);
         }
-        enemysStateManager.ChangeState(EnemyState.isHit);
+        if (enemysStateManager.currentState != EnemyState.isAttack)
+        { 
+            enemysStateManager.ChangeState(EnemyState.isHit);
+        }
         onHitEvent?.OnDamage(atk);
         onHitEvent?.HitSpecialEffect(hitPoint, hitForward);
     }
