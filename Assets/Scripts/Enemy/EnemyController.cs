@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor.Rendering;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -38,13 +37,15 @@ public class EnemyController : MonoBehaviour
 
     public float distance;
     private Vector3 dir;
+
+    public bool CanTakeDamage => !isHit;
+
     void Awake()
     {
         enemysStateManager = GetComponent<EnemysStateManager>();
         cc = GetComponent<CharacterController>();
         //rb = GetComponent<Rigidbody>();
         disDetection = GetComponentInChildren<DistanceDetection>();
-        onHitEvent.enemyDamage += OnHit;
         currentBlood = blood;
         attackDetection.SetActive(false);
     }
@@ -72,18 +73,32 @@ public class EnemyController : MonoBehaviour
             isHit = false;
         }
     }
-    private void OnDestroy()
+    public void TakeDamage(Transform attacker, float atk, Vector3 hitPoint, Vector3 hitForward)
     {
-        onHitEvent.enemyDamage -= OnHit;
-    }
-    public void OnHit(Transform player,float atk)
-    { 
+        if (!CanTakeDamage)
+        {
+            return;
+        }
+
         isHit = true;
-        transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(dir), rotationSpeed);
         currentGoodTime = maxGoodTime;
         currentBlood -= atk;
-        bloodImage.fillAmount = Mathf.Clamp(currentBlood / blood, 0, 1);
+        if (attacker != null)
+        {
+            Vector3 lookDir = attacker.position - transform.position;
+            lookDir.y = 0f;
+            if (lookDir.sqrMagnitude > 0.001f)
+            {
+                transform.rotation = Quaternion.LookRotation(lookDir.normalized, Vector3.up);
+            }
+        }
+        if (bloodImage != null)
+        {
+            bloodImage.fillAmount = Mathf.Clamp(currentBlood / blood, 0, 1);
+        }
         enemysStateManager.ChangeState(EnemyState.isHit);
+        onHitEvent?.OnDamage(atk);
+        onHitEvent?.HitSpecialEffect(hitPoint, hitForward);
     }
     public void OnRun()
     {

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.InputSystem;
 
 public class UIManager : MonoBehaviour
 {
@@ -22,6 +23,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] private GameObject KeysCanvas;
     [SerializeField] private GameObject OriginalKeysCanvas;
     private UIState currentState;
+    private UIState previousState;
     private bool isInitialized = false;
 
     void Awake()
@@ -42,17 +44,37 @@ public class UIManager : MonoBehaviour
     }
     void Initialize()//初始化
     {
-        inputAction = new PlayerInput();
-        inputAction.Player.UISetting.performed += ctx => OnSettingsButton();
+        inputAction = SharedPlayerInput.Actions;
         ChangeState(UIState.Start);
+    }
+    private void OnEnable()
+    {
+        if (inputAction == null)
+        {
+            return;
+        }
+
+        inputAction.Player.UISetting.performed += OnSettingsPerformed;
+        inputAction.UI.Cancel.performed += OnUICancelPerformed;
     }
     void OnDisable()
     {
-        inputAction.Player.Disable();
+        if (inputAction == null)
+        {
+            return;
+        }
+
+        inputAction.Player.UISetting.performed -= OnSettingsPerformed;
+        inputAction.UI.Cancel.performed -= OnUICancelPerformed;
     }
 
     private void ChangeState(UIState newState)
     {
+        if (currentState != newState)
+        {
+            previousState = currentState;
+        }
+
         if (currentState == UIState.Settings || currentState == UIState.KeysSet)
         {
             Time.timeScale = 1f;
@@ -75,7 +97,7 @@ public class UIManager : MonoBehaviour
                 if (Player != null) Player.SetActive(false);
                 if (BackGround != null) BackGround.SetActive(false);
                 gameState.ChangeState(GameState.StartMenu);
-                DisableGameplayInput();
+                EnableUIInput();
                 Debug.Log("禁用输入");
                 break;
             case UIState.Settings:
@@ -84,7 +106,7 @@ public class UIManager : MonoBehaviour
                 if (BackGround != null) BackGround.SetActive(true);
                 gameState.ChangeState(GameState.PauseMenu);
                 Time.timeScale = 0f;
-                DisableGameplayInput();
+                EnableUIInput();
                 break;
             case UIState.KeysSet:
                 KeysCanvas.SetActive(true);
@@ -92,19 +114,19 @@ public class UIManager : MonoBehaviour
                 if (BackGround != null) BackGround.SetActive(true);
                 gameState.ChangeState(GameState.PauseMenu);
                 Time.timeScale = 0f;
-                DisableGameplayInput();
+                EnableUIInput();
                 break;
             case UIState.OriginalSettings:
                 OriginalSetCanvas.SetActive(true);
                 if (Player != null) Player.SetActive(false);
                 if (BackGround != null) BackGround.SetActive(false);
-                DisableGameplayInput();
+                EnableUIInput();
                 break;
             case UIState.OriginalKeys:
                 OriginalKeysCanvas.SetActive(true);
                 if (Player != null) Player.SetActive(false);
                 if (BackGround != null) BackGround.SetActive(false);
-                DisableGameplayInput();
+                EnableUIInput();
                 break;
             case UIState.Normal:
                 NormalCanvas.SetActive(true);
@@ -139,11 +161,11 @@ public class UIManager : MonoBehaviour
 
     private void EnableGameplayInput()// 启用游戏输入
     {
-        inputAction.Player.Enable();
+        SharedPlayerInput.EnableGameplay();
     }
-    private void DisableGameplayInput() // 禁用游戏输入
+    private void EnableUIInput()
     {
-        inputAction.Player.Disable();
+        SharedPlayerInput.EnableUI();
     }
     public void SetCurrentSceneObjects(GameObject scenePlayer, GameObject sceneBackground)
     {
@@ -161,5 +183,23 @@ public class UIManager : MonoBehaviour
     {
         Player = null;
         BackGround = null;
+    }
+
+    private void OnSettingsPerformed(InputAction.CallbackContext ctx)
+    {
+        if (currentState == UIState.Normal)
+        {
+            OnSettingsButton();
+        }
+    }
+
+    private void OnUICancelPerformed(InputAction.CallbackContext ctx)
+    {
+        if (currentState == UIState.Start || currentState == UIState.Normal)
+        {
+            return;
+        }
+
+        ChangeState(previousState);
     }
 }

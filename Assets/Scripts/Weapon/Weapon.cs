@@ -19,7 +19,11 @@ public class Weapon : MonoBehaviour
     }
     private void OnTriggerEnter(Collider other)
     {
-        if (other.tag!= "Enemy") return;
+        if (!other.CompareTag("Enemy")) return;
+
+        EnemyController enemy = other.GetComponent<EnemyController>();
+        if (enemy == null) return;
+
         //敌方碰撞体与武器碰撞体的向量方向
         Vector3 forward = (transform.position - other.transform.position).normalized;
         //估算碰撞点位置
@@ -28,11 +32,9 @@ public class Weapon : MonoBehaviour
         {
             onHitEvent.EnemyHit(transform.root, other.transform);
         }
-        if (other.GetComponent<EnemyController>().currentGoodTime == other.GetComponent<EnemyController>().maxGoodTime && (playerStatesManager.currentState == State.isAttack || playerStatesManager.currentState == State.exAttack))
+        if (playerStatesManager.currentState == State.isAttack || playerStatesManager.currentState == State.exAttack)
         {
-            onHitEvent.EnemyDamage(transform.root, attackData.currentAtk);
-            onHitEvent.OnDamage(attackData.currentAtk);
-            onHitEvent.HitSpecialEffect(position, forward);
+            enemy.TakeDamage(transform.root, attackData.currentAtk, position, forward);
         }
         enemyTransform = other.transform;
         playerControls.EnemyLocate(enemyTransform);

@@ -24,27 +24,31 @@ public class PlayerControls : MonoBehaviour
     public float goodTime;
     public bool isGoodTime;
     private float nextTime;
+    private int currentExAttackStage;
 
     private void Awake()
     {
-        inputActions = new PlayerInput();
+        inputActions = SharedPlayerInput.Actions;
         animator = GetComponent<Animator>();
         playerStatesManager = GetComponent<PlayerStatesManager>();
         characterController = GetComponent<CharacterController>();
         attackData = GetComponent<AttackData>();
-        inputActions.Player.Move.performed += ctx => moveValue = ctx.ReadValue<Vector2>();
-        inputActions.Player.Move.canceled += ctx => moveValue = Vector2.zero;
-        inputActions.Player.Attack.performed += ctx => Attack();
-        inputActions.Player.Evade.performed += ctx => Evade();
-        inputActions.Player.ExAttack.performed += ctx => ExAttack();
     }
     private void OnEnable()
     {
-        inputActions.Enable();
+        inputActions.Player.Move.performed += OnMovePerformed;
+        inputActions.Player.Move.canceled += OnMoveCanceled;
+        inputActions.Player.Attack.performed += OnAttackPerformed;
+        inputActions.Player.Evade.performed += OnEvadePerformed;
+        inputActions.Player.ExAttack.performed += OnExAttackPerformed;
     }
     private void OnDisable()
     {
-        inputActions.Disable();
+        inputActions.Player.Move.performed -= OnMovePerformed;
+        inputActions.Player.Move.canceled -= OnMoveCanceled;
+        inputActions.Player.Attack.performed -= OnAttackPerformed;
+        inputActions.Player.Evade.performed -= OnEvadePerformed;
+        inputActions.Player.ExAttack.performed -= OnExAttackPerformed;
     }
     void LateUpdate()
     {
@@ -149,26 +153,46 @@ public class PlayerControls : MonoBehaviour
     private void AttackDamage()
     {
         int index = playerStatesManager.attackCounter - 1;
-        if (attackData.attackDamage.Count > 0 && index >= 0 && index < attackData.maxAttackCounter)
+        if (attackData.attackDamage.Count > 0 && index >= 0 && index < attackData.attackDamage.Count)
         {
             attackData.currentAtk = attackData.baseAtk * (attackData.attackDamage[index]);
         }
     }
     private void ExAttack()
     {
-        AttackDir();
-        onAttackEvent.OnExAttack(transform);
-        if (attackData.exDamage.Count > 0)
+        if (gameStateManager.currentState != GameState.Player || playerStatesManager.currentState == State.exAttack)
         {
-            for (int index = 0; index < 3; index++)
-            { 
-                attackData.currentAtk = attackData.baseAtk * (attackData.exDamage[index]);
-            }
+            return;
         }
+
+        AttackDir();
+        currentExAttackStage = 0;
+        SetExAttackDamage(currentExAttackStage);
+        onAttackEvent.OnExAttack(transform);
         playerStatesManager.ChangeState(State.exAttack);
+    }
+    public void SetExAttackDamage(int stageIndex)
+    {
+        if (attackData.exDamage.Count == 0)
+        {
+            return;
+        }
+
+        currentExAttackStage = Mathf.Clamp(stageIndex, 0, attackData.exDamage.Count - 1);
+        attackData.currentAtk = attackData.baseAtk * attackData.exDamage[currentExAttackStage];
+    }
+    public void AdvanceExAttackDamage()
+    {
+        if (attackData.exDamage.Count == 0)
+        {
+            return;
+        }
+
+        SetExAttackDamage(currentExAttackStage + 1);
     }
     public void ExitExAttack()
     {
+        currentExAttackStage = 0;
         onAttackEvent.OutExAttack();
     }
     #endregion
@@ -213,5 +237,29 @@ public class PlayerControls : MonoBehaviour
         if(isGround==true) return;
         characterController.Move(gravity * Vector3.down * Time.deltaTime);
     }
-    
+
+    private void OnMovePerformed(InputAction.CallbackContext ctx)
+    {
+        moveValue = ctx.ReadValue<Vector2>();
+    }
+
+    private void OnMoveCanceled(InputAction.CallbackContext ctx)
+    {
+        moveValue = Vector2.zero;
+    }
+
+    private void OnAttackPerformed(InputAction.CallbackContext ctx)
+    {
+        Attack();
+    }
+
+    private void OnEvadePerformed(InputAction.CallbackContext ctx)
+    {
+        Evade();
+    }
+
+    private void OnExAttackPerformed(InputAction.CallbackContext ctx)
+    {
+        ExAttack();
+    }
 }

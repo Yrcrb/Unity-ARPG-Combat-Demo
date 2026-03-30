@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public enum GameState 
 {
@@ -67,5 +68,36 @@ public class GameStateManager : MonoBehaviour
                 break;
         }
 
+    }
+}
+
+public static class SharedPlayerInput
+{
+    private static PlayerInput actions;
+
+    public static PlayerInput Actions
+    {
+        get
+        {
+            if (actions == null)
+            {
+                actions = new PlayerInput();
+                actions.Disable();
+            }
+
+            return actions;
+        }
+    }
+
+    public static void EnableGameplay()
+    {
+        Actions.UI.Disable();
+        Actions.Player.Enable();
+    }
+
+    public static void EnableUI()
+    {
+        Actions.Player.Disable();
+        Actions.UI.Enable();
     }
 }

@@ -528455,6 +528455,13 @@ AnimationClip:
     floatParameter: 0
     intParameter: 6
     messageOptions: 0
+  - time: 0.2
+    functionName: SetExAttackDamage
+    data: 
+    objectReferenceParameter: {fileID: 0}
+    floatParameter: 0
+    intParameter: 0
+    messageOptions: 0
   - time: 0.3
     functionName: AttackVFX
     data: 
@@ -528469,6 +528476,13 @@ AnimationClip:
     floatParameter: 0
     intParameter: 8
     messageOptions: 0
+  - time: 0.43333334
+    functionName: SetExAttackDamage
+    data: 
+    objectReferenceParameter: {fileID: 0}
+    floatParameter: 0
+    intParameter: 1
+    messageOptions: 0
   - time: 0.76666665
     functionName: AttackVFX
     data: 
@@ -528476,7 +528490,14 @@ AnimationClip:
     floatParameter: 0
     intParameter: 9
     messageOptions: 0
-  - time: 2.3666666
+  - time: 0.8
+    functionName: SetExAttackDamage
+    data: 
+    objectReferenceParameter: {fileID: 0}
+    floatParameter: 0
+    intParameter: 2
+    messageOptions: 0
+  - time: 1.7
     functionName: InterimState
     data: 
     objectReferenceParameter: {fileID: 0}

@@ -1,9 +1,7 @@
 using Cinemachine;
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 public enum CameraState
 {
@@ -44,7 +42,7 @@ public class CameraManager : MonoBehaviour
 
     private void Awake()
     {
-        inputActions = new PlayerInput();
+        inputActions = SharedPlayerInput.Actions;
         onHitEvent.enemyHit += AttackCamera;
         onHitEvent.enemyHit += Reserve;
         onAttackEvent.onAttack += Shake;
@@ -53,22 +51,18 @@ public class CameraManager : MonoBehaviour
         normalBlend = brain.m_DefaultBlend;
         ChangeCamera(CameraState.Normal);
     }
-    private void OnEnable()
-    {
-        inputActions.Enable();
-    }
-    private void OnDisable()
-    {
-        inputActions.Disable();
-    }
     private void OnDestroy()
     {
         if (onHitEvent != null)
         {
             onHitEvent.enemyHit -= AttackCamera;
             onHitEvent.enemyHit -= Reserve;
+        }
+        if (onAttackEvent != null)
+        {
             onAttackEvent.onAttack -= Shake;
             onAttackEvent.onExAttack -= ExAttackCamera;
+            onAttackEvent.outExAttack -= ExitExAttack;
         }
     }
     private void LateUpdate()
