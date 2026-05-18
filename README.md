@@ -34,14 +34,29 @@ The project focuses on a Root Motion-driven combat system and an event-driven ar
 本项目为基于 Unity 与 C# 独立开发的第三人称 ARPG 战斗 Demo，  
 围绕 Root Motion 动作驱动与事件驱动架构构建，实现角色战斗、相机控制及基础客户端架构设计。
 
-## ⭐ 技术亮点
-- 基于 Root Motion 的角色控制与战斗系统  
-- 基于 Cinemachine 的多状态相机系统  
+## ⭐ 功能特性
+- 基于 Root Motion 的角色移动与战斗系统  
+- 攻击、受击与连招逻辑实现  
+- 基于 Cinemachine 的相机系统（状态切换、屏幕震动、FOV 变更）  
 - 事件驱动架构实现模块解耦  
+- 基于有限状态机的 UI 系统  
 - 通用对象池优化性能  
-- **自定义行为树框架驱动敌人 AI（Selector / Sequence / PreCondition / Action）**
-- **优先级行为切换：受击 > 攻击 > 过渡 > 警戒 > 追击 > 巡逻 > 待机**
-- **PreConditionNode 实现持续状态的条件守卫，每帧校验前置条件**  
+- **行为树驱动的敌人 AI 系统**  
+
+## 🛠 技术栈
+- Unity (C#)  
+- Animator (Root Motion)  
+- Cinemachine  
+- ScriptableObject (Event System)  
+- NavMesh (AI 寻路)  
+
+## 💡 核心亮点
+- 实现 Root Motion 驱动战斗系统，保证动画与位移一致性  
+- 设计模块化客户端架构，通过事件驱动实现模块间通信  
+- 应用对象池降低 GC 分配，提升运行时性能  
+- **设计自定义行为树框架（Selector / Sequence / PreCondition / Action）驱动敌人 AI**
+- **实现基于优先级的行为切换：受击 > 攻击 > 过渡 > 警戒 > 追击 > 巡逻 > 待机**
+- **引入 PreConditionNode 实现持续状态的条件守卫，将动作逻辑与前置条件检查分离**  
 
 ---
 
