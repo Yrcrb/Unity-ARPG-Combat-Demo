@@ -528497,8 +528497,8 @@ AnimationClip:
     floatParameter: 0
     intParameter: 2
     messageOptions: 0
-  - time: 1.7
-    functionName: InterimState
+  - time: 2.7333333
+    functionName: OnExAttackAllowExit
     data: 
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0

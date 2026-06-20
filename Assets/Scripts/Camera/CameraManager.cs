@@ -14,8 +14,6 @@ public class CameraManager : MonoBehaviour
 {
     public CinemachineTargetGroup group;
     public GameStateManager gameStateManager;
-    public OnHitEvent onHitEvent;
-    public OnAttackEvent onAttackEvent;
     public float distance;
     public CameraState currentCameraState;
     private PlayerInput inputActions;
@@ -42,28 +40,23 @@ public class CameraManager : MonoBehaviour
 
     private void Awake()
     {
+        if (gameStateManager == null) gameStateManager = GameStateManager.Instance;
         inputActions = SharedPlayerInput.Actions;
-        onHitEvent.enemyHit += AttackCamera;
-        onHitEvent.enemyHit += Reserve;
-        onAttackEvent.onAttack += Shake;
-        onAttackEvent.onExAttack += ExAttackCamera;
-        onAttackEvent.outExAttack += ExitExAttack;
+        EventBus.Instance.Add<Transform, Transform>(E.EnemyHit, AttackCamera);
+        EventBus.Instance.Add<Transform, Transform>(E.EnemyHit, Reserve);
+        EventBus.Instance.Add(E.OnAttack, Shake);
+        EventBus.Instance.Add<Transform>(E.OnExAttack, ExAttackCamera);
+        EventBus.Instance.Add(E.OutExAttack, ExitExAttack);
         normalBlend = brain.m_DefaultBlend;
         ChangeCamera(CameraState.Normal);
     }
     private void OnDestroy()
     {
-        if (onHitEvent != null)
-        {
-            onHitEvent.enemyHit -= AttackCamera;
-            onHitEvent.enemyHit -= Reserve;
-        }
-        if (onAttackEvent != null)
-        {
-            onAttackEvent.onAttack -= Shake;
-            onAttackEvent.onExAttack -= ExAttackCamera;
-            onAttackEvent.outExAttack -= ExitExAttack;
-        }
+        EventBus.Instance.Remove<Transform, Transform>(E.EnemyHit, AttackCamera);
+        EventBus.Instance.Remove<Transform, Transform>(E.EnemyHit, Reserve);
+        EventBus.Instance.Remove(E.OnAttack, Shake);
+        EventBus.Instance.Remove<Transform>(E.OnExAttack, ExAttackCamera);
+        EventBus.Instance.Remove(E.OutExAttack, ExitExAttack);
     }
     private void LateUpdate()
     {
@@ -137,8 +130,9 @@ public class CameraManager : MonoBehaviour
             ChangeCamera(CameraState.Normal);
         }
     }
-    private void ZoomView() //鼠标缩放
+    private void ZoomView()
     {
+        if (gameStateManager == null) return;
         if (gameStateManager.currentState != GameState.Player) return;
         Scroll = inputActions.Player.Mouse.ReadValue<Vector2>();
         targetDistance += -Scroll.y * scrollSensitivity;
@@ -156,8 +150,9 @@ public class CameraManager : MonoBehaviour
     {
         cinemachineImpulseSource.GenerateImpulse();
     }
-    private void LockedCinema()//屏幕锁定
+    private void LockedCinema()
     {
+        if (gameStateManager == null) return;
         if (gameStateManager.currentState != GameState.Player)
         {
             exAttackCamera.enabled = false;

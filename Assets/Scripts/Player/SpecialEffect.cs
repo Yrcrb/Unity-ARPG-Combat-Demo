@@ -7,17 +7,15 @@ public class SpecialEffect : MonoBehaviour
     public GameObject[] attackEffects;
     public GameObject hitEffects;
     public Transform parentObject;
-    public OnAttackEvent onAttackEvent;
-    public OnHitEvent onHitEvent;
     private void Awake()
     {
-        onHitEvent.hitSpecialEffect += HitVFX;
+        EventBus.Instance.Add<Vector3, Vector3>(E.HitVFX, HitVFX);
     }
     public void AttackVFX(int vfxIndex)
     {
         if (attackEffects == null || vfxIndex < 0 || vfxIndex >= attackEffects.Length) return;
         if (parentObject == null) return;
-        onAttackEvent.OnAttack();
+        EventBus.Instance.Invoke(E.OnAttack);
         GameObject vfx = Instantiate(attackEffects[vfxIndex]);
         vfx.transform.SetParent(parentObject, false);
         Destroy(vfx, 1f);

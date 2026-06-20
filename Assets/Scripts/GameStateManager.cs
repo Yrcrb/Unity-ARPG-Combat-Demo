@@ -14,10 +14,13 @@ public enum GameState
 
 public class GameStateManager : MonoBehaviour
 {
+    public static GameStateManager Instance { get; private set; }
     public GameState currentState;
-    void Start()
+
+    private void Awake()
     {
-        ChangeState(GameState.StartMenu);
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
     }
     public void ChangeState(GameState newState)
     {

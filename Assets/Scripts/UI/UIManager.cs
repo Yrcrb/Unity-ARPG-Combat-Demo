@@ -22,6 +22,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] private GameObject NormalCanvas;
     [SerializeField] private GameObject KeysCanvas;
     [SerializeField] private GameObject OriginalKeysCanvas;
+    [SerializeField] private GameObject BagCanvas;
     private UIState currentState;
     private UIState previousState;
     private bool isInitialized = false;
@@ -44,6 +45,7 @@ public class UIManager : MonoBehaviour
     }
     void Initialize()//初始化
     {
+        if (gameState == null) gameState = GameStateManager.Instance;
         inputAction = SharedPlayerInput.Actions;
         ChangeState(UIState.Start);
     }
@@ -55,6 +57,7 @@ public class UIManager : MonoBehaviour
         }
 
         inputAction.Player.UISetting.performed += OnSettingsPerformed;
+        inputAction.Player.Bag.performed += OnBagPerformed;
         inputAction.UI.Cancel.performed += OnUICancelPerformed;
     }
     void OnDisable()
@@ -65,6 +68,7 @@ public class UIManager : MonoBehaviour
         }
 
         inputAction.Player.UISetting.performed -= OnSettingsPerformed;
+        inputAction.Player.Bag.performed -= OnBagPerformed;
         inputAction.UI.Cancel.performed -= OnUICancelPerformed;
     }
 
@@ -75,7 +79,7 @@ public class UIManager : MonoBehaviour
             previousState = currentState;
         }
 
-        if (currentState == UIState.Settings || currentState == UIState.KeysSet)
+        if (currentState == UIState.Settings || currentState == UIState.KeysSet || currentState == UIState.Bag)
         {
             Time.timeScale = 1f;
             if (Player != null) Player.SetActive(false);
@@ -89,6 +93,7 @@ public class UIManager : MonoBehaviour
         KeysCanvas.SetActive(false);
         OriginalSetCanvas.SetActive(false);
         OriginalKeysCanvas.SetActive(false);
+        if (BagCanvas != null) BagCanvas.SetActive(false);
 
         switch (newState)
         {
@@ -135,6 +140,17 @@ public class UIManager : MonoBehaviour
                 gameState.ChangeState(GameState.Player);
                 EnableGameplayInput();
                 OnBeginButton();
+                break;
+            case UIState.Bag:
+                if (BagCanvas == null)
+                    Debug.LogError("[UIManager] BagCanvas 未赋值！请在 Inspector 拖入背包面板");
+                else
+                    BagCanvas.SetActive(true);
+                if (Player != null) Player.SetActive(true);
+                if (BackGround != null) BackGround.SetActive(true);
+                gameState.ChangeState(GameState.PauseMenu);
+                Time.timeScale = 0f;
+                inputAction.UI.Enable();
                 break;
         }
 
@@ -193,10 +209,24 @@ public class UIManager : MonoBehaviour
         }
     }
 
+    private void OnBagPerformed(InputAction.CallbackContext ctx)
+    {
+        if (currentState == UIState.Normal)
+            ChangeState(UIState.Bag);
+        else if (currentState == UIState.Bag)
+            ChangeState(UIState.Normal);
+    }
+
     private void OnUICancelPerformed(InputAction.CallbackContext ctx)
     {
         if (currentState == UIState.Start || currentState == UIState.Normal)
         {
+            return;
+        }
+
+        if (currentState == UIState.Bag)
+        {
+            ChangeState(UIState.Normal);
             return;
         }
 

@@ -1,12 +1,10 @@
-using System.Collections;
-using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 public class DisplayManager : MonoBehaviour
 {
     [SerializeField] private GameObject damagePrefab;
     private ObjectPool<DamageDisplay> pool;
-    public OnHitEvent onHitEvent;
     private void Awake()
     {
         pool = new ObjectPool<DamageDisplay>(
@@ -19,26 +17,24 @@ public class DisplayManager : MonoBehaviour
             (DamageDisplay display) => display.gameObject.SetActive(true),
             (DamageDisplay display) => display.gameObject.SetActive(false),
              100, 10);
-        onHitEvent.Damage += OnDamageTaken;
+        EventBus.Instance.Add<float>(E.OnDamage, OnDamageTaken);
     }
     private void OnDamageTaken(float damageValue)
     {
-        StartCoroutine(ShowDamage(damageValue));
+        ShowDamage(damageValue).Forget();
     }
 
-    private IEnumerator ShowDamage(float damageValue)
+    private async UniTaskVoid ShowDamage(float damageValue)
     {
         DamageDisplay display = pool.Get();
         if (display == null)
-        { 
-            yield break; 
-        }
+            return;
         display.DamageReset(damageValue);
-        yield return new WaitForSeconds(0.6f);
+        await UniTask.Delay(600);
         pool.Release(display);
     }
     private void OnDestroy()
     {
-        onHitEvent.Damage -= OnDamageTaken;
+        EventBus.Instance.Remove<float>(E.OnDamage, OnDamageTaken);
     }
 }

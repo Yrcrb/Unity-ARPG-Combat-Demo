@@ -26,7 +26,6 @@ public class EnemyController : MonoBehaviour
     public Image bloodImage;
 
     // 受击事件资源，用来广播伤害数字和受击特效。
-    public OnHitEvent onHitEvent;
     #endregion
 
     #region Health Settings
@@ -323,8 +322,8 @@ public class EnemyController : MonoBehaviour
             bloodImage.fillAmount = Mathf.Clamp(currentBlood / blood, 0f, 1f);
         }
 
-        onHitEvent?.OnDamage(atk);
-        onHitEvent?.HitSpecialEffect(hitPoint, hitForward);
+        EventBus.Instance.Invoke(E.OnDamage, atk);
+        EventBus.Instance.Invoke(E.HitVFX, hitPoint, hitForward);
     }
 
     // 受击动作开始时关闭位移和攻击判定，并锁住行为。
@@ -702,10 +701,8 @@ public class EnemyController : MonoBehaviour
     // 让 NavMeshAgent 前往指定位置。
     private void MoveTo(Vector3 destination)
     {
-        if (!agent.enabled)
-        {
+        if (!agent.enabled || !agent.isOnNavMesh)
             return;
-        }
 
         agent.isStopped = false;
         if (!agent.hasPath || Vector3.Distance(agent.destination, destination) > 0.1f)
@@ -717,10 +714,8 @@ public class EnemyController : MonoBehaviour
     // 立即停掉 NavMeshAgent 当前路径。
     private void StopAgent()
     {
-        if (!agent.enabled)
-        {
+        if (!agent.enabled || !agent.isOnNavMesh)
             return;
-        }
 
         agent.isStopped = true;
         agent.ResetPath();

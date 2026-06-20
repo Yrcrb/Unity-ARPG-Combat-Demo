@@ -1,0 +1,104 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6f9821800de2b14c9e9791f33ccc01a, type: 3}
+  m_Name: AnimationConfig
+  m_EditorClassIdentifier: 
+  globalDefaultDuration: 0.1
+  entities:
+  - entityId: Player
+    states:
+    - stateName: idle
+      animationState: idle
+      transitionDuration: 0.2
+      speedMultiplier: 1
+      comboAnimations: []
+    - stateName: isRun
+      animationState: run_start
+      transitionDuration: -1
+      speedMultiplier: 1
+      comboAnimations: []
+    - stateName: run_end
+      animationState: run_end
+      transitionDuration: 0.2
+      speedMultiplier: 1
+      comboAnimations: []
+    - stateName: isAttack
+      animationState: Attack_Normal_01
+      transitionDuration: -1
+      speedMultiplier: 1
+      comboAnimations:
+      - Attack_Normal_01
+      - Attack_Normal_02
+      - Attack_Normal_03
+      - Attack_Normal_04
+    - stateName: exAttack
+      animationState: Ex_Start
+      transitionDuration: 0.2
+      speedMultiplier: 1
+      comboAnimations: []
+    - stateName: evade
+      animationState: evade_front
+      transitionDuration: 0.2
+      speedMultiplier: 1
+      comboAnimations: []
+    - stateName: isHit_Front
+      animationState: Hit_Front
+      transitionDuration: -1
+      speedMultiplier: 1
+      comboAnimations: []
+    - stateName: isHit_Back
+      animationState: Hit_Back
+      transitionDuration: -1
+      speedMultiplier: 1
+      comboAnimations: []
+  - entityId: StoneMan
+    states:
+    - stateName: idle
+      animationState: Idle
+      transitionDuration: 0.2
+      speedMultiplier: 1
+      comboAnimations: []
+    - stateName: isRun
+      animationState: Run - Forward
+      transitionDuration: 0.2
+      speedMultiplier: 1
+      comboAnimations: []
+    - stateName: patrol
+      animationState: Patrol
+      transitionDuration: 0.2
+      speedMultiplier: 1
+      comboAnimations: []
+    - stateName: isAttack
+      animationState: Attack
+      transitionDuration: -1
+      speedMultiplier: 1
+      comboAnimations: []
+    - stateName: isVigilant_left
+      animationState: ForwardLeft
+      transitionDuration: 0.2
+      speedMultiplier: 1
+      comboAnimations: []
+    - stateName: isVigilant_right
+      animationState: ForwardRight
+      transitionDuration: 0.2
+      speedMultiplier: 1
+      comboAnimations: []
+    - stateName: isHit
+      animationState: Damage
+      transitionDuration: 0.2
+      speedMultiplier: 1
+      comboAnimations: []
+    - stateName: interim
+      animationState: Action_A 0
+      transitionDuration: 0.2
+      speedMultiplier: 1
+      comboAnimations: []

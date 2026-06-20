@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class Weapon : MonoBehaviour
 {
-    public OnHitEvent onHitEvent;
     private PlayerStatesManager playerStatesManager;
     private Transform enemyTransform;
     private PlayerControls playerControls;
@@ -30,7 +29,7 @@ public class Weapon : MonoBehaviour
         Vector3 position = other.ClosestPoint(transform.position);
         if (playerStatesManager.currentState == State.isAttack)
         {
-            onHitEvent.EnemyHit(transform.root, other.transform);
+            EventBus.Instance.Invoke(E.EnemyHit, transform.root, other.transform);
         }
         if (playerStatesManager.currentState == State.isAttack || playerStatesManager.currentState == State.exAttack)
         {

@@ -6,7 +6,6 @@ using UnityEngine.UI;
 
 public class AudioManager : MonoBehaviour
 {
-    public OnAttackEvent onAttackEvent;
     public AudioSource audioSource;
     public AudioClip attackClip;
     public List<Slider> sliders = new List<Slider>();
@@ -17,16 +16,16 @@ public class AudioManager : MonoBehaviour
         {
             audioSource.clip = attackClip;
         }
-        onAttackEvent.onAttack += AttackAudio;
+        EventBus.Instance.Add(E.OnAttack, AttackAudio);
         AudioControl();
     }
-    private void AudioControl()//订阅滑动监听函数
+    private void AudioControl()
     {
         foreach (var slider in sliders)
         {
-            slider.onValueChanged.AddListener(AudioChange);
+            if (slider != null)
+                slider.onValueChanged.AddListener(AudioChange);
         }
-        
     }
     private void AudioChange(float newValue)
     {
@@ -36,14 +35,15 @@ public class AudioManager : MonoBehaviour
         {
             audioSource.volume = value;
             foreach (var slider in sliders)
-            { 
-                slider.value = value;
+            {
+                if (slider != null)
+                    slider.value = value;
             }
         }
     }
     private void OnDestroy()
     {
-        onAttackEvent.onAttack -= AttackAudio;
+        EventBus.Instance.Remove(E.OnAttack, AttackAudio);
         foreach (var slider in sliders)
         {
             if (slider != null)
